@@ -1,0 +1,43 @@
+REGRAS – ETAPA 1 DO PROJETO MESAFARTAI
+
+1. Criar um repositório PÚBLICO no GitHub com o nome exato:
+   PROJETO-MESAFARTAI
+
+2. Adicionar todos os integrantes como colaboradores e adicionar o professor.
+
+3. Criar o README.md na raiz do projeto contendo:
+   - Título oficial do projeto.
+   - Descrição resumida da solução.
+   - Alinhamento com a ODS 2.
+   - Nome completo e RGM de cada integrante.
+
+4. Criar a pasta /docs contendo:
+   - regras.txt
+   - escopo_projeto.md
+
+5. O arquivo escopo_projeto.md deve descrever:
+   - O problema de negócio.
+   - O público-alvo.
+   - As intenções tratadas.
+   - Os dados coletados pelo chat.
+   - O prompt utilizado para criação do logotipo.
+
+6. Criar a pasta /src e o arquivo:
+   src/database.py
+
+7. O script deve inicializar um banco SQLite3 chamado:
+   mesafartai.db
+
+8. O banco deve possuir as tabelas:
+   - usuarios
+   - doacoes
+   - matches
+
+9. O banco deve receber dados de teste para ONGs e doadores.
+
+10. Criar a pasta /assets e salvar o logotipo do projeto nela.
+
+11. A entrega deve ser feita no GitHub conforme as orientações da aula.
+
+12. Atenção:
+   A atividade deve ser realizada em sala de aula, conforme orientação do material.
