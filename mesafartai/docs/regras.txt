@@ -1,0 +1,125 @@
+REGRAS – ETAPA 1 DO PROJETO MESAFARTAI
+
+1. Criar um repositório PÚBLICO no GitHub com o nome exato:
+   PROJETO-MESAFARTAI
+
+2. Adicionar todos os integrantes como colaboradores e adicionar o professor.
+
+3. Criar o README.md na raiz do projeto contendo:
+   - Título oficial do projeto.
+   - Descrição resumida da solução.
+   - Alinhamento com a ODS 2.
+   - Nome completo e RGM de cada integrante.
+
+4. Criar a pasta /docs contendo:
+   - regras.txt
+   - escopo_projeto.md
+
+5. O arquivo escopo_projeto.md deve descrever:
+   - O problema de negócio.
+   - O público-alvo.
+   - As intenções tratadas.
+   - Os dados coletados pelo chat.
+   - O prompt utilizado para criação do logotipo.
+
+6. Criar a pasta /src e o arquivo:
+   src/database.py
+
+7. O script deve inicializar um banco SQLite3 chamado:
+   mesafartai.db
+
+8. O banco deve possuir as tabelas:
+   - usuarios
+   - doacoes
+   - matches
+
+9. O banco deve receber dados de teste para ONGs e doadores.
+
+10. Criar a pasta /assets e salvar o logotipo do projeto nela.
+
+11. A entrega deve ser feita no GitHub conforme as orientações da aula.
+
+12. Atenção:
+   A atividade deve ser realizada em sala de aula, conforme orientação do material.
+
+
+REGRAS – ETAPA 2 (AC-3): MOTOR NLU E TRAVA DE THRESHOLD
+
+13. Preparar o ambiente local no VS Code:
+    a) Clonar o repositório oficial usando a URL HTTPS copiada no GitHub:
+       git clone https://github.com/SEU_USUARIO/PROJETO-MESAFARTAI.git
+    b) Entrar na pasta do projeto:
+       cd PROJETO-MESAFARTAI
+    c) Abrir a pasta no VS Code:
+       code .
+    d) Instalar as dependências listadas no requirements.txt:
+       pip install -r requirements.txt
+
+14. Manter o arquivo requirements.txt na raiz do projeto com as bibliotecas:
+    streamlit
+    scikit-learn
+    pandas
+    numpy
+
+15. Criar e manter o módulo src/nlu.py:
+    a) Vetorizar as frases com TfidfVectorizer, usando n-gramas de 1 e 2 palavras.
+    b) Treinar RandomForestClassifier com 80 árvores (n_estimators=80) e random_state=42.
+    c) Classificar as intenções cadastrar_doacao, solicitar_alimentos, consultar_status e fora_de_escopo.
+    d) Usar limiar_threshold=0.60 como limite mínimo de confiança.
+    e) Retornar fallback quando a confiança máxima for menor que 0.60 ou a intenção prevista for fora_de_escopo.
+    f) Tratar entrada vazia ou inválida com fallback.
+
+16. Executar e validar o módulo no terminal do VS Code:
+    python src/nlu.py
+    Conferir as quatro frases de teste e verificar que mensagens de baixa confiança
+    ou fora de escopo recebem fallback. O resultado pode variar caso o dataset,
+    a versão das bibliotecas ou os parâmetros sejam alterados.
+
+17. Versionar e enviar as alterações para o GitHub:
+    git add .
+    git commit -m "feat(nlu): implementa motor TF-IDF + Random Forest com trava de threshold"
+    git push origin main
+    Se a branch principal do repositório tiver outro nome, utilizar o nome correto.
+    Confirmar no GitHub se o commit foi publicado.
+
+18. Registrar a execução:
+    Criar docs/relatório_fase1_etapa2.md com a quantidade de árvores, o threshold,
+    os resultados observados na execução, propostas de melhoria e justificativa
+    para o uso do Random Forest.
+
+REGRAS – ETAPA 3 (AC-3): EXTRAÇÃO REGEX E MATCHMAKING KNN
+
+19. Preparar o ambiente no VS Code (na raiz do projeto):
+    a) Instalar as dependências: pip install -r requirements.txt
+    b) Se necessário, inicializar/migrar o SQLite: python src/database.py
+
+20. Extrair entidades da mensagem sem IA usando Regex:
+    a) Usar src/entidades.py para identificar alimento, quantidade, unidade e prazo de validade.
+    b) A extração reconhece números decimais com ponto ou vírgula, unidades como kg, g, lt, l, ml, caixas e unidades.
+    c) A urgência é ALTA para validade em até 2 dias, MÉDIA de 3 a 5 dias e BAIXA acima de 5 dias.
+    d) A validade também pode ser informada por “hoje” ou “amanhã”.
+    e) Executar: python src/entidades.py
+
+21. Registrar a doação estruturada no SQLite:
+    a) A função registrar_doacao_por_mensagem(mensagem, doador_id) fica em src/entidades.py.
+    b) Ela grava alimento, quantidade, unidade, validade, dias restantes e urgência na tabela doacoes.
+    c) Para unidades que não são kg, a coluna antiga quantidade_kg fica nula; a quantidade e a unidade são guardadas nas colunas genéricas.
+    d) A tabela doacoes recebe as colunas quantidade, unidade, validade_dias e urgencia por migração compatível com bancos existentes.
+
+22. Encontrar a ONG mais próxima usando KNN:
+    a) src/matchmaking.py lê as ONGs com coordenadas válidas da tabela usuarios no SQLite.
+    b) NearestNeighbors com k=1 recomenda a ONG com coordenadas mais próximas das coordenadas do doador.
+    c) A distância apresentada é calculada em quilômetros usando a fórmula de Haversine.
+    d) Executar: python src/matchmaking.py
+    e) A função salvar_match(doacao_id, ong_id, distancia_km) permite gravar a recomendação na tabela matches depois de validar a doação.
+
+23. Executar a demonstração integrada Regex + KNN:
+    python src/etapa3_demo.py
+    A demonstração usa a mensagem “Atenção: estamos doando 35 lt de leite fresco que vence em 2 dias!” e coordenadas de exemplo. Em uso real, substitua as coordenadas demonstrativas pelas coordenadas do doador cadastrado.
+
+24. Validar e versionar as alterações:
+    a) Conferir se a mensagem de exemplo retorna Leite, 35.0 lt e urgência ALTA.
+    b) Conferir se o KNN retorna uma ONG cadastrada com latitude/longitude.
+    c) Executar git status e revisar os arquivos antes de enviar.
+    d) Executar git add ., git commit -m "feat(etapa3): adiciona extracao Regex e matchmaking KNN" e git push origin main.
+    e) Confirmar o commit no GitHub. O push deve ser executado pelo integrante no próprio repositório.
